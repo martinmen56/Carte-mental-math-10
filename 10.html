@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flashcards - Variables Aléatoires</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #2C75FF, #002FA7);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(circle at 20% 50%, rgba(255,255,255,0.1), transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255,255,255,0.1), transparent 50%);
+            pointer-events: none;
+        }
+
+        .container {
+            max-width: 850px;
+            width: 100%;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 2.8em;
+            margin-bottom: 12px;
+        }
+
+        .header p {
+            font-size: 1.3em;
+				
+        }
+			
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 35px;
+        }
+
+        .btn {
+            padding: 14px 30px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            background: white;
+            color: #667eea;
+        }
+
+        .card {
+            background: white;
+            border-radius: 25px;
+            padding: 45px;
+            min-height: 420px;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .card-label {
+            font-size: 13px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            padding: 10px 24px;
+            border-radius: 25px;
+            display: inline-block;
+        }
+
+        .question {
+            background: linear-gradient(135deg, #74D0F1, #0000FF);
+            color: white;
+        }
+
+        .answer {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+        }
+
+        .card-content {
+            font-size: 20px;
+            line-height: 1.8;
+            white-space: pre-line;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 25px;
+        }
+
+        .nav-btn {
+            padding: 12px 25px;
+            border-radius: 50px;
+            border: none;
+            background: linear-gradient(135deg, #74D0F1, #0000FF);
+            color: white;
+            cursor: pointer;
+        }
+
+        .progress-bar {
+            margin-top: 20px;
+            height: 12px;
+            background: #003366;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #74D0F1, #0000FF);
+            width: 0%;
+            transition: width 0.4s;
+        }
+		truc {
+			color: white;
+			}
+    </style>
+</head>
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 Variables Aléatoires Réelles Finies</h1>
+            <p>Couples, vecteurs et covariance</p>
+        </div>
+
+        <div class="controls">
+            <button class="btn" onclick="shuffleCards()">
+                <span>🔀</span>
+                <span>Mélanger</span>
+            </button>
+            <button class="btn" onclick="resetCards()">
+                <span>🔄</span>
+                <span>Réinitialiser</span>
+            </button>
+        </div>
+
+        <div class="card-container">
+            <div class="card-wrapper">
+                <div class="card" onclick="flipCard()">
+                    <div class="card-label question" id="cardLabel">QUESTION</div>
+                    <div class="card-content" id="cardContent"></div>
+                    <div class="card-hint">💡 Cliquez sur la carte pour la retourner</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="navigation">
+            <button class="nav-btn" onclick="previousCard()">
+                <span>←</span>
+                <span>Précédent</span>
+            </button>
+            <div class="counter">
+                <span id="currentCard">1</span> / <span id="totalCards">20</span>
+            </div>
+            <button class="nav-btn" onclick="nextCard()">
+                <span>Suivant</span>
+                <span>→</span>
+            </button>
+        </div>
+
+        <div class="progress-section">
+            <div class="progress-title">
+                <span>📊</span>
+                <truc>Progression</truc>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+const flashcardsData = [
+    {
+        question: "Qu'est-ce qu'un couple de variables aléatoires réelles finies ?",
+        answer: `
+Un couple de variables aléatoires réelles est une application :
+$$
+(X,Y) : \\Omega \\longrightarrow \\mathbb{R}^2
+$$
+définie par :
+$$
+\\omega \\longmapsto (X(\\omega), Y(\\omega))
+$$
+où $X$ et $Y$ sont deux variables aléatoires réelles sur un univers fini $\\Omega$.
+`
+    },
+    {
+        question: "Définition de la loi conjointe d'un couple $(X,Y)$",
+        answer: `
+La loi conjointe est donnée par :
+$$
+\\mathbb{P}(X = x_i, Y = y_j)
+$$
+pour tout $x_i \\in X(\\Omega)$ et $y_j \\in Y(\\Omega)$.
+
+Elle est représentée par un **tableau de contingence**.
+`
+    },
+    {
+        question: "Comment obtenir les lois marginales ?",
+        answer: `
+On a :
+$$
+\\mathbb{P}(X = x_i) = \\sum_j \\mathbb{P}(X = x_i, Y = y_j)
+$$
+
+$$
+\\mathbb{P}(Y = y_j) = \\sum_i \\mathbb{P}(X = x_i, Y = y_j)
+$$
+`
+    },
+    {
+        question: "Définition de la covariance",
+        answer: `
+La covariance de $X$ et $Y$ est définie par :
+$$
+\\mathrm{Cov}(X,Y) = \\mathbb{E}\\big[(X-\\mathbb{E}(X))(Y-\\mathbb{E}(Y))\\big]
+$$
+Elle mesure la dépendance linéaire entre $X$ et $Y$.
+`
+    },
+    {
+        question: "Formule de Koenig",
+        answer: `
+La formule pratique est :
+$$
+\\mathrm{Cov}(X,Y) = \\mathbb{E}(XY) - \\mathbb{E}(X)\\mathbb{E}(Y)
+$$
+`
+    },
+    {
+        question: "Coefficient de corrélation linéaire",
+        answer: `
+On définit :
+$$
+\\rho(X,Y) = \\frac{\\mathrm{Cov}(X,Y)}{\\sigma(X)\\,\\sigma(Y)}
+$$
+
+avec :
+$$
+-1 \\leq \\rho(X,Y) \\leq 1
+$$
+`
+    },
+    {
+        question: "Décorrélation",
+        answer: `
+$X$ et $Y$ sont décorrélées si :
+$$
+\\mathrm{Cov}(X,Y) = 0
+$$
+
+Dans ce cas :
+$$
+\\mathrm{V}(X+Y) = \\mathrm{V}(X) + \\mathrm{V}(Y)
+$$
+`
+    },
+    {
+    question: "Variance d'une somme de variables aléatoires",
+    answer: `
+Soient $X_1, \\dots, X_n$ des variables aléatoires.
+
+$$
+\\mathrm{V}\\!\\left( \\sum_{i=1}^{n} X_i \\right)
+=
+\\sum_{i=1}^{n} \\mathrm{V}(X_i)
++
+2 \\sum_{1 \\le i < j \\le n} \\mathrm{Cov}(X_i, X_j)
+$$
+`
+},
+    {
+        question: "Cas des variables indépendantes",
+        answer: `
+Si $X_1,\\dots,X_n$ sont indépendantes :
+$$
+\\mathrm{V}\\left(\\sum_{i=1}^n X_i\\right)
+=
+\\sum_{i=1}^n \\mathrm{V}(X_i)
+$$
+`
+    },
+    {
+        question: "Loi binomiale",
+        answer: `
+Si $X \\sim \\mathcal{B}(n,p)$ :
+$$
+\\mathbb{E}(X) = np
+$$
+$$
+\\mathrm{V}(X) = np(1-p)
+$$
+`
+    }
+];
+
+let cards = [...flashcardsData];
+let currentIndex = 0;
+let isFlipped = false;
+
+function displayCard() {
+    const card = cards[currentIndex];
+    const label = document.getElementById("cardLabel");
+    const content = document.getElementById("cardContent");
+
+    if (isFlipped) {
+        label.textContent = "RÉPONSE";
+        label.className = "card-label answer";
+        content.innerHTML = card.answer;
+    } else {
+        label.textContent = "QUESTION";
+        label.className = "card-label question";
+        content.innerHTML = card.question;
+    }
+
+    document.getElementById("currentCard").textContent = currentIndex + 1;
+    document.getElementById("totalCards").textContent = cards.length;
+    document.getElementById("progressFill").style.width =
+        ((currentIndex + 1) / cards.length) * 100 + "%";
+
+    // 🔥 Re-render MathJax
+    MathJax.typesetPromise();
+}
+
+function flipCard() {
+    isFlipped = !isFlipped;
+    displayCard();
+}
+
+function nextCard() {
+    isFlipped = false;
+    currentIndex = (currentIndex + 1) % cards.length;
+    displayCard();
+}
+
+function previousCard() {
+    isFlipped = false;
+    currentIndex = (currentIndex - 1 + cards.length) % cards.length;
+    displayCard();
+}
+
+function shuffleCards() {
+    cards.sort(() => Math.random() - 0.5);
+    currentIndex = 0;
+    displayCard();
+}
+
+function resetCards() {
+    cards = [...flashcardsData];
+    currentIndex = 0;
+    displayCard();
+}
+
+displayCard();
+</script>
+</body>
+
+</html>
