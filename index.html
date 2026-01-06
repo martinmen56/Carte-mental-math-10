@@ -54,9 +54,7 @@
 
         .header p {
             font-size: 1.3em;
-				
         }
-			
 
         .controls {
             display: flex;
@@ -82,6 +80,8 @@
             min-height: 420px;
             cursor: pointer;
             text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            transition: transform 0.6s;
         }
 
         .card-label {
@@ -109,9 +109,16 @@
             white-space: pre-line;
         }
 
+        .card-hint {
+            margin-top: 30px;
+            font-size: 14px;
+            color: #888;
+        }
+
         .navigation {
             display: flex;
             justify-content: space-between;
+            align-items: center;
             margin-top: 25px;
         }
 
@@ -122,10 +129,27 @@
             background: linear-gradient(135deg, #74D0F1, #0000FF);
             color: white;
             cursor: pointer;
+            font-weight: 600;
+        }
+
+        .counter {
+            font-size: 1.3em;
+            color: white;
+            font-weight: 600;
+        }
+
+        .progress-section {
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .progress-title {
+            color: white;
+            font-size: 1.2em;
+            margin-bottom: 10px;
         }
 
         .progress-bar {
-            margin-top: 20px;
             height: 12px;
             background: #003366;
             border-radius: 10px;
@@ -136,13 +160,11 @@
             height: 100%;
             background: linear-gradient(90deg, #74D0F1, #0000FF);
             width: 0%;
-            transition: width 0.4s;
+            transition: width 0.4s ease;
         }
-		truc {
-			color: white;
-			}
     </style>
 </head>
+
 <script>
   window.MathJax = {
     tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
@@ -151,21 +173,20 @@
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
 <body>
     <div class="container">
         <div class="header">
             <h1>📚 Variables Aléatoires Réelles Finies</h1>
-            <p>Couples, vecteurs et covariance</p>
+            <p>Couples, vecteurs, covariance et indépendance</p>
         </div>
 
         <div class="controls">
             <button class="btn" onclick="shuffleCards()">
-                <span>🔀</span>
-                <span>Mélanger</span>
+                <span>🔀</span> Mélanger
             </button>
             <button class="btn" onclick="resetCards()">
-                <span>🔄</span>
-                <span>Réinitialiser</span>
+                <span>🔄</span> Réinitialiser
             </button>
         </div>
 
@@ -174,30 +195,21 @@
                 <div class="card" onclick="flipCard()">
                     <div class="card-label question" id="cardLabel">QUESTION</div>
                     <div class="card-content" id="cardContent"></div>
-                    <div class="card-hint">💡 Cliquez sur la carte pour la retourner</div>
+                    <div class="card-hint">💡 Cliquez sur la carte pour voir la réponse</div>
                 </div>
             </div>
         </div>
 
         <div class="navigation">
-            <button class="nav-btn" onclick="previousCard()">
-                <span>←</span>
-                <span>Précédent</span>
-            </button>
+            <button class="nav-btn" onclick="previousCard()">← Précédent</button>
             <div class="counter">
-                <span id="currentCard">1</span> / <span id="totalCards">20</span>
+                <span id="currentCard">1</span> / <span id="totalCards">30</span>
             </div>
-            <button class="nav-btn" onclick="nextCard()">
-                <span>Suivant</span>
-                <span>→</span>
-            </button>
+            <button class="nav-btn" onclick="nextCard()">Suivant →</button>
         </div>
 
         <div class="progress-section">
-            <div class="progress-title">
-                <span>📊</span>
-                <truc>Progression</truc>
-            </div>
+            <div class="progress-title">📊 Progression</div>
             <div class="progress-bar">
                 <div class="progress-fill" id="progressFill"></div>
             </div>
@@ -207,127 +219,124 @@
     <script>
 const flashcardsData = [
     {
-        question: "Qu'est-ce qu'un couple de variables aléatoires réelles finies ?",
-        answer: `
-Un couple de variables aléatoires réelles est une application :
-$$
-(X,Y) : \\Omega \\longrightarrow \\mathbb{R}^2
-$$
-définie par :
-$$
-\\omega \\longmapsto (X(\\omega), Y(\\omega))
-$$
-où $X$ et $Y$ sont deux variables aléatoires réelles sur un univers fini $\\Omega$.
-`
+        question: "Qu’est-ce qu’un couple de variables aléatoires réelles finies ?",
+        answer: "Une application $(X,Y): \\Omega \\to \\mathbb{R}^2$ où $X$ et $Y$ sont deux variables aléatoires réelles finies définies sur le même univers probabilisé."
     },
     {
-        question: "Définition de la loi conjointe d'un couple $(X,Y)$",
-        answer: `
-La loi conjointe est donnée par :
-$$
-\\mathbb{P}(X = x_i, Y = y_j)
-$$
-pour tout $x_i \\in X(\\Omega)$ et $y_j \\in Y(\\Omega)$.
-
-Elle est représentée par un **tableau de contingence**.
-`
+        question: "Comment appelle-t-on aussi un couple de variables aléatoires ?",
+        answer: "Un vecteur aléatoire."
     },
     {
-        question: "Comment obtenir les lois marginales ?",
-        answer: `
-On a :
-$$
-\\mathbb{P}(X = x_i) = \\sum_j \\mathbb{P}(X = x_i, Y = y_j)
-$$
-
-$$
-\\mathbb{P}(Y = y_j) = \\sum_i \\mathbb{P}(X = x_i, Y = y_j)
-$$
-`
+        question: "Qu’est-ce que la loi conjointe d’un couple $(X,Y)$ ?",
+        answer: "La fonction $\\mathbb{P}(X=x_i, Y=y_j)$ pour toutes les valeurs possibles de $X$ et $Y$."
     },
     {
-        question: "Définition de la covariance",
-        answer: `
-La covariance de $X$ et $Y$ est définie par :
-$$
-\\mathrm{Cov}(X,Y) = \\mathbb{E}\\big[(X-\\mathbb{E}(X))(Y-\\mathbb{E}(Y))\\big]
-$$
-Elle mesure la dépendance linéaire entre $X$ et $Y$.
-`
+        question: "Que permet de déterminer la loi conjointe ?",
+        answer: "Toutes les probabilités liées au couple $(X,Y)$."
     },
     {
-        question: "Formule de Koenig",
-        answer: `
-La formule pratique est :
-$$
-\\mathrm{Cov}(X,Y) = \\mathbb{E}(XY) - \\mathbb{E}(X)\\mathbb{E}(Y)
-$$
-`
+        question: "Comment calcule-t-on la loi marginale de $X$ ?",
+        answer: "$$\\mathbb{P}(X=x_i)=\\sum_j \\mathbb{P}(X=x_i,Y=y_j)$$"
     },
     {
-        question: "Coefficient de corrélation linéaire",
-        answer: `
-On définit :
-$$
-\\rho(X,Y) = \\frac{\\mathrm{Cov}(X,Y)}{\\sigma(X)\\,\\sigma(Y)}
-$$
-
-avec :
-$$
--1 \\leq \\rho(X,Y) \\leq 1
-$$
-`
+        question: "Les lois marginales déterminent-elles la loi conjointe ?",
+        answer: "❌ Non, la réciproque est fausse."
     },
     {
-        question: "Décorrélation",
-        answer: `
-$X$ et $Y$ sont décorrélées si :
-$$
-\\mathrm{Cov}(X,Y) = 0
-$$
-
-Dans ce cas :
-$$
-\\mathrm{V}(X+Y) = \\mathrm{V}(X) + \\mathrm{V}(Y)
-$$
-`
+        question: "Qu’est-ce qu’un tableau de contingence ?",
+        answer: "Un tableau à double entrée regroupant la loi conjointe et les lois marginales."
     },
     {
-    question: "Variance d'une somme de variables aléatoires",
-    answer: `
-Soient $X_1, \\dots, X_n$ des variables aléatoires.
-
-$$
-\\mathrm{V}\\!\\left( \\sum_{i=1}^{n} X_i \\right)
-=
-\\sum_{i=1}^{n} \\mathrm{V}(X_i)
-+
-2 \\sum_{1 \\le i < j \\le n} \\mathrm{Cov}(X_i, X_j)
-$$
-`
-},
-    {
-        question: "Cas des variables indépendantes",
-        answer: `
-Si $X_1,\\dots,X_n$ sont indépendantes :
-$$
-\\mathrm{V}\\left(\\sum_{i=1}^n X_i\\right)
-=
-\\sum_{i=1}^n \\mathrm{V}(X_i)
-$$
-`
+        question: "Définition de la loi conditionnelle de $Y$ sachant $X=x_i$ ?",
+        answer: "$$\\mathbb{P}(Y=y_j \\mid X=x_i)=\\frac{\\mathbb{P}(X=x_i,Y=y_j)}{\\mathbb{P}(X=x_i)}$$"
     },
     {
-        question: "Loi binomiale",
-        answer: `
-Si $X \\sim \\mathcal{B}(n,p)$ :
-$$
-\\mathbb{E}(X) = np
-$$
-$$
-\\mathrm{V}(X) = np(1-p)
-$$
-`
+        question: "Quand une loi conditionnelle est-elle définie ?",
+        answer: "Lorsque $\\mathbb{P}(X=x_i) \\neq 0$."
+    },
+    {
+        question: "Quand dit-on que $X$ et $Y$ sont indépendantes ?",
+        answer: "$$\\mathbb{P}(X=x_i,Y=y_j)=\\mathbb{P}(X=x_i)\\mathbb{P}(Y=y_j)$$"
+    },
+    {
+        question: "Que signifie concrètement l’indépendance ?",
+        answer: "La valeur de l’une n’influence pas la valeur de l’autre."
+    },
+    {
+        question: "Si $X$ et $Y$ sont indépendantes, que vaut $\\mathbb{P}(A\\cap B)$ ?",
+        answer: "$$\\mathbb{P}(A\\cap B)=\\mathbb{P}(A)\\mathbb{P}(B)$$"
+    },
+    {
+        question: "Loi de $X+Y$ si $X$ et $Y$ sont indépendantes ?",
+        answer: "$$\\mathbb{P}(X+Y=k)=\\sum_i \\mathbb{P}(X=i,Y=k-i)$$"
+    },
+    {
+        question: "Définition de la covariance de $X$ et $Y$ ?",
+        answer: "$$\\mathrm{Cov}(X,Y)=\\mathbb{E}\\big[(X-\\mathbb{E}(X))(Y-\\mathbb{E}(Y))\\big]$$"
+    },
+    {
+        question: "Formule de Koenig pour la covariance ?",
+        answer: "$$\\mathrm{Cov}(X,Y)=\\mathbb{E}(XY)-\\mathbb{E}(X)\\mathbb{E}(Y)$$"
+    },
+    {
+        question: "Que vaut $\\mathrm{Cov}(X,X)$ ?",
+        answer: "$\\mathrm{Var}(X)$"
+    },
+    {
+        question: "La covariance peut-elle être négative ?",
+        answer: "✅ Oui."
+    },
+    {
+        question: "Covariance et linéarité ?",
+        answer: "$$\\mathrm{Cov}(aX+b,Y)=a\\,\\mathrm{Cov}(X,Y)$$"
+    },
+    {
+        question: "Inégalité de Cauchy-Schwarz (covariance) ?",
+        answer: "$$|\\mathrm{Cov}(X,Y)|\\le\\sqrt{\\mathrm{Var}(X)\\mathrm{Var}(Y)}$$"
+    },
+    {
+        question: "Définition du coefficient de corrélation linéaire ?",
+        answer: "$$\\rho(X,Y)=\\frac{\\mathrm{Cov}(X,Y)}{\\sqrt{\\mathrm{Var}(X)\\mathrm{Var}(Y)}}$$"
+    },
+    {
+        question: "Valeurs possibles de $\\rho(X,Y)$ ?",
+        answer: "$-1 \\le \\rho(X,Y) \\le 1$"
+    },
+    {
+        question: "Quand a-t-on $|\\rho|=1$ ?",
+        answer: "Quand $Y=aX+b$ presque sûrement."
+    },
+    {
+        question: "Définition de la décorrélation ?",
+        answer: "$$\\mathrm{Cov}(X,Y)=0$$"
+    },
+    {
+        question: "Indépendance ⇒ décorrélation ?",
+        answer: "✅ Oui."
+    },
+    {
+        question: "Décorrélation ⇒ indépendance ?",
+        answer: "❌ Faux en général."
+    },
+    {
+        question: "Qu’est-ce qu’un vecteur aléatoire ?",
+        answer: "Une application $(X_1,\\dots,X_p):\\Omega\\to\\mathbb{R}^p$."
+    },
+    {
+        question: "Quand des VAR sont-elles mutuellement indépendantes ?",
+        answer: "Quand la loi conjointe est le produit de toutes les lois marginales."
+    },
+        {
+        question: "Variance d’une somme de VAR quelconques ?",
+        answer: "$$\\mathrm{Var}\\left(\\sum_{i} X_i\\right)= \\sum_{i} \\mathrm{Var}(X_i)+ 2 \\sum_{i < j} \\mathrm{Cov}(X_i, X_j)$$"
+    },
+    {
+        question: "Variance d’une somme de VAR quelconques ?",
+        answer: "$$\\mathrm{Var}\\left( \\sum_{i} X_i \\right)= \\sum_{i} \\mathrm{Var}(X_i)+ 2 \\sum_{1 \\le i < j \\le n} \\mathrm{Cov}(X_i, X_j)$$"
+    },
+    {
+        question: "Somme de VAR de Bernoulli indépendantes ?",
+        answer: "Suit une loi binomiale $\\mathcal{B}(n,p)$."
     }
 ];
 
@@ -355,7 +364,6 @@ function displayCard() {
     document.getElementById("progressFill").style.width =
         ((currentIndex + 1) / cards.length) * 100 + "%";
 
-    // 🔥 Re-render MathJax
     MathJax.typesetPromise();
 }
 
@@ -379,17 +387,19 @@ function previousCard() {
 function shuffleCards() {
     cards.sort(() => Math.random() - 0.5);
     currentIndex = 0;
+    isFlipped = false;
     displayCard();
 }
 
 function resetCards() {
     cards = [...flashcardsData];
     currentIndex = 0;
+    isFlipped = false;
     displayCard();
 }
 
+// Initialisation
 displayCard();
-</script>
+    </script>
 </body>
-
 </html>
